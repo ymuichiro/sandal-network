@@ -1,5 +1,9 @@
 import { Account, NetworkType } from "symbol-sdk";
+import { SymbolHtlc } from "@atomicport/symbol";
 
+const node = "http://samdal-1.dusanjp.com:3000";
+const generationHashSeed = "2C922AF117618EC9CBA13D64243456305C9C0BABD6ED492F2979B7017F6102AB";
+const epochAdjustment = 1706705527;
 const accountA = Account.generateNewAccount(NetworkType.MAIN_NET);
 const accountB = Account.generateNewAccount(NetworkType.MAIN_NET);
 
@@ -12,6 +16,13 @@ console.log({
   address: accountB.address.plain(),
   privateKey: accountB.privateKey,
   publicKey: accountB.publicKey,
+});
+
+const client = new SymbolHtlc(node, NetworkType.MAIN_NET, generationHashSeed, epochAdjustment);
+const hashPair = client.createHashPair();
+console.log({
+  secret: hashPair.secret,
+  proof: hashPair.proof,
 });
 
 // address: 'NDZVWPFIJW3SJOKI46TLFWVQMXRP2TKRCON2HJQ',

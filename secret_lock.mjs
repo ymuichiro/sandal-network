@@ -1,4 +1,5 @@
-import { TransactionHttp, NetworkType } from "symbol-sdk";
+import { TransactionHttp, NetworkType, Address } from "symbol-sdk";
+import { waitConfirmedTransaction } from "./announce.mjs";
 import { SymbolHtlc } from "@atomicport/symbol";
 
 const node = "http://samdal-1.dusanjp.com:3000";
@@ -19,8 +20,16 @@ const ACCOUNT = {
 };
 
 const client = new SymbolHtlc(node, NetworkType.MAIN_NET, generationHashSeed, epochAdjustment);
+// const hashPair = {
+//   secret: "590904E8BD086A3B733855267EF780E378CE15596941F69F8EFB68C7EB6DD1DB",
+//   proof: "DD284B69B2EE39CEAABF496F1A3C3C626DF585371F6F2DE51FDCABB771C8FA93",
+// };
 const hashPair = client.createHashPair();
 const transaction = client.lock(ACCOUNT.alice.address, currencyMosaicId, hashPair.secret, 1);
 const signed = await client.sign(ACCOUNT.bob.privateKey, transaction);
 
 new TransactionHttp(node).announce(signed).subscribe((e) => console.log(e));
+
+waitConfirmedTransaction(node, Address.createFromRawAddress(ACCOUNT.bob.address), signed.hash).then((e) =>
+  console.log(`result ${e}`)
+);
